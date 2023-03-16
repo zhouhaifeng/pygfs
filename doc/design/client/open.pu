@@ -1,0 +1,8 @@
+@startuml
+actor client
+client -> chunkserver: grpc连接master, 查询文件所在的server和chunkindex, server包含主副本
+client -> chunkserver: grpc连接chunkserver
+note right: 连接主chunkserver
+client -> chunkserver: 查找chunkindex
+chunkserver -> client: 如果查找成功, 返回chunkindex handle, 查找失败,返回错误
+@enduml

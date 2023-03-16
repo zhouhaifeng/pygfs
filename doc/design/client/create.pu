@@ -1,0 +1,8 @@
+@startuml
+actor client
+client -> master: grpc连接master
+note right: master有主备, 通过slb进行主备负载均衡, slb与主备master之间进行keepalive检测, 主备master数据严格一致, 主备切换期间master不可用
+client -> master: 如果没有此client, create namespace
+client -> master: write metadata
+master -> client: return metadata
+@enduml

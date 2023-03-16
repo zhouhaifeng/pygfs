@@ -3,9 +3,7 @@ package client
 
 import sys
 
-class Meta(object):
-    def __init__(self):
-        self.chunks = []
+
 
 class Client(object):
     def __init__(self):

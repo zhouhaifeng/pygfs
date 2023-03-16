@@ -1,0 +1,41 @@
+@startuml
+
+
+master *-- NameSpace
+master *-- RpcServer
+master <-- ChunkServer
+
+class Master {
+    String        name 
+    NameSpace     ns
+    Master        shadow
+    RpcServer     rpcserver
+    ChunkServer   chunkservers
+    void          int()
+    void          backup()
+    int           create()
+    int           open()
+    int           close()
+    int           delete()
+}
+
+class NameSpace {
+   String         name
+}
+
+clase Lease {
+   int            period
+}
+
+class ChunkServer {
+   String         uuid 
+   Lease          lease
+   map            chunks
+
+}
+
+class RpcServer {
+    int         port
+}
+
+@enduml
