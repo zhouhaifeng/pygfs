@@ -1,6 +1,0 @@
-@startuml
-actor client
-client -> chunkserver: grpc连接chunkserver
-note right: 连接主chunkserver
-client -> chunkserver: 根据chunkindex和偏移量读取文件, 如果与metadata不符,停止读取, 如果读取出错, 读取副本
-@enduml
