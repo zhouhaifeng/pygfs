@@ -9,6 +9,8 @@ import contextlib
 import sys
 import os
 import etcd
+#from pygfs
+import tree
 
 class DualStackServer(ThreadingHTTPServer):
     def server_bind(self):
@@ -25,6 +27,7 @@ class Master(object):
     def __init__(self):        
         self.parent = None 
         self.master_state_watcher = None
+        #B tree to save metadata
         self.metadata = Tree(1000)
     #start http server for healthcheck
     def start_httpserver(server_class=DualStackServer,
