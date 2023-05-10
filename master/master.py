@@ -22,13 +22,16 @@ class DualStackServer(ThreadingHTTPServer):
 class MasterState(enum):
     Leader = 1
     Backup = 2
-
+#for master with python, it's not lockfree to operate metadata.
 class Master(object):
     def __init__(self):        
         self.parent = None 
         self.master_state_watcher = None
         #B tree to save metadata
-        self.metadata = Tree(1000)
+        #metadata: the file and chunk namespaces, the mapping from files to chunks, and the locations of each chunk’s replicas. 
+        #memory limit scale of the approach
+        #baidu adopts a tiered metadata organization-- CFS: Scaling Metadata Service for Distributed File System via Pruned Scope of Critical Sections
+        self.meta = Tree(1000)
     #start http server for healthcheck
     def start_httpserver(server_class=DualStackServer,
             handler_class=SimpleHTTPRequestHandler,
