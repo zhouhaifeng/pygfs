@@ -1,0 +1,39 @@
+@startuml
+actor client
+#append
+client -> chunkserver: grpc连接chunkserver, 如果连接失败,连接副门chunkserver
+note right: 此时不存在数据拆分写入到多个chunkserver的情况, 需考虑磁盘空间不足, 无法append的情况
+client -> chunkserver: 将数据写入所有副本chunkserver所在节点缓冲区
+chunkserver -> chunkserver: 主副本写数据,生成index
+chunkserver -> chunkserver: 通知其他副本按照index写入数据
+chunkserver -> chunkserver: 所有副本server通知主server写入是否成功
+chunkserver -> chunkserver: 所有副本server写入成功则主副本通知client写入成功
+chunkserver -> chunkserver: 有副本写入失败在通知client写入失败
+#create
+client -> master: grpc连接master
+note right: master有主备, 通过slb进行主备负载均衡, slb与主备master之间进行keepalive检测, 主备master数据严格一致, 主备切换期间master不可用
+client -> master: create file
+client -> master: 如果没有此client, create namespace
+client -> master: write metadata
+master -> client: return metadata
+client -> chunkserver: grpc连接master, 查询文件所在的server和chunkindex, server包含主副本
+#open
+client -> chunkserver: grpc连接chunkserver
+note right: 连接主chunkserver
+client -> chunkserver: 查找chunkindex
+chunkserver -> client: 如果查找成功, 返回chunkindex handle, 查找失败,返回错误
+#read
+client -> chunkserver: grpc连接chunkserver
+note right: 连接主chunkserver
+client -> chunkserver: 根据chunkindex和偏移量读取文件, 如果与metadata不符,停止读取, 如果读取出错, 读取副本
+#write
+client -> chunkserver: grpc连接chunkserver, 如果连接失败,连接副门chunkserver
+note right: client已经获取metadata, 连接主chunkserver
+client -> chunkserver: 将数据写入所有副本chunkserver所在节点缓冲区
+chunkserver -> chunkserver: 缓冲区调度
+chunkserver -> chunkserver: 主副本写数据,生成index
+chunkserver -> chunkserver: 通知其他副本按照index写入数据
+chunkserver -> chunkserver: 所有副本server通知主server写入是否成功
+chunkserver -> chunkserver: 所有副本server写入成功则主副本通知client写入成功
+chunkserver -> chunkserver: 有副本写入失败在通知client写入失败
+@enduml
