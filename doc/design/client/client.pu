@@ -15,7 +15,7 @@ note right: master有主备, 通过slb进行主备负载均衡, slb与主备mast
 client -> master: 如果file不存在, create file, 写metadata, 如果存在, 返回fd, chunkindex, 文件信息
 master -> client: return metadata
 #close
-client -> chunkserver: 关闭client与chunkserver之间的连接
+client -> chunkserver: 如果client存在与chunkserver之间的连接, 关闭client与chunkserver之间的连接
 #read
 client -> chunkserver: grpc连接chunkserver
 note right: 连接主chunkserver

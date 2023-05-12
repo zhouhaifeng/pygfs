@@ -22,16 +22,24 @@ class DualStackServer(ThreadingHTTPServer):
 class MasterState(enum):
     Leader = 1
     Backup = 2
+
+class MasterConfig(object):
+    def __init__(self):  
+        #limit of master's performance
+        self.configmap = ["meta_node": 100000, "chunkserver_count", 1000]
+        #current scale of master's performance
+        self.statistics = ["meta_node": 0, "chunkserver_count", 0]
+
 #for master with python, it's not lockfree to operate metadata.
 class Master(object):
-    def __init__(self):        
+    def __init__(self, configmap):        
         self.parent = None 
         self.master_state_watcher = None
-        #B tree to save metadata
+        #etcd to save metadata
         #metadata: the file and chunk namespaces, the mapping from files to chunks, and the locations of each chunk’s replicas. 
-        #memory limit scale of the approach
-        #baidu adopts a tiered metadata organization-- CFS: Scaling Metadata Service for Distributed File System via Pruned Scope of Critical Sections
-        self.meta = Tree(1000)
+        #todo: refer to cfs and infinifs
+        self.etcd_conn = None
+        self.grpc_server = None
     #start http server for healthcheck
     def start_httpserver(server_class=DualStackServer,
             handler_class=SimpleHTTPRequestHandler,
@@ -72,6 +80,13 @@ class Master(object):
         self.master_state_watcher = EtcdWatcher()
         self.master_state_watcher.start()
         self.master_state_watcher.join()  
+    def start_grpc_server(self):
+        self.server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
+        route_guide_pb2_grpc.add_RouteGuideServicer_to_server(
+          RouteGuideServicer(), server)
+        server.add_insecure_port('[::]:50051')
+        server.start()
+        server.wait_for_termination()
 
     def find(self, name):
     def add_chunkserver(self, ip):
@@ -83,6 +98,7 @@ if __name__ == "__main__":
     try:
         #master选举, 在需要使用master/slave状态的地方
         # 通过master_state_watcher进行获取.
+        master_config = MasterConfig()
         master = Master()
         # 启动http server for healthcheck
         master.start_httpserver()
