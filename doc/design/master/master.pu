@@ -1,5 +1,7 @@
 @startuml
-
+actor master
+actor client
+actor chunkserver
 
 master *-- NameSpace
 master *-- RpcServer
@@ -13,9 +15,9 @@ class Master {
     ChunkServer   chunkservers
     void          int()
     void          backup()
-    int           create()
-    int           open()
+    string        open()
     int           close()
+    string        create()
     int           delete()
 }
 

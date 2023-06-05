@@ -1,0 +1,41 @@
+
+
+message ClientOpenRequestMsg {
+    string ns = 1;
+    int32  flags = 2;
+    int32  length = 3;
+    bytes  perams = 4;
+}
+
+message ClientOpenResponseMsg {
+    string ns = 1;
+    uint64 chunkindex = 2;
+}
+
+message ClientCloseMsg {
+    uint64  fd = 1;
+}
+
+message ClientReadRequestMsg {
+    uint64  fd = 1;
+    uint64  chunkindex = 2;
+    uint32  length = 3;
+}
+
+message ClientReadResponseMsg {
+    uint64  fd = 1;
+    uint64  chunkindex = 2;
+    uint32  length = 3;
+    bytes   buf = 4;
+}
+
+message ClientWriteRequestMsg {
+    uint64  fd = 1;
+    uint64  chunkindex = 2;
+    uint32  length = 3;
+}
+
+message ClientWriteResponseMsg {
+    uint64  fd = 1;
+    bool    result = 2;
+}
