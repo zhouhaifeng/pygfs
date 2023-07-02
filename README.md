@@ -1,5 +1,8 @@
 google gfs开源实现
+gfs v1:
 https://pdos.csail.mit.edu/6.824/papers/gfs.pdf
+gfs v2:
+https://www.sohu.com/a/413895492_673711
 
 共5个组件, client, master, chunkserver, etcd, rocksdb 
 client支持cli, api, rpc, chunkserver

@@ -40,6 +40,12 @@ class Master(object):
         #todo: refer to cfs and infinifs
         self.etcd_conn = None
         self.grpc_server = None
+        #key: master node index; value: master object
+        self.master_nodes = {}
+        self.meta_data = Meta()
+        #key: chunkserver index; value: chunksever object
+        self.chunkserver_nodes = {}
+        
     #start http server for healthcheck
     def start_httpserver(server_class=DualStackServer,
             handler_class=SimpleHTTPRequestHandler,
